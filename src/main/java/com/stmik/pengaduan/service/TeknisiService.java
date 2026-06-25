@@ -1,6 +1,7 @@
 package com.stmik.pengaduan.service;
 
 import com.stmik.pengaduan.dto.request.TeknisiRequest;
+import com.stmik.pengaduan.dto.request.TeknisiEditRequest;
 import com.stmik.pengaduan.entity.Teknisi;
 import com.stmik.pengaduan.enums.RoleEnum;
 import com.stmik.pengaduan.exception.BadRequestException;
@@ -61,7 +62,7 @@ public class TeknisiService {
     }
 
     @Transactional
-    public Teknisi edit(Integer id, TeknisiRequest req) {
+    public Teknisi edit(Integer id, TeknisiEditRequest req) {
         Teknisi t = getById(id);
         t.setNamaLengkap(req.getNamaLengkap());
         t.setEmail(req.getEmail());

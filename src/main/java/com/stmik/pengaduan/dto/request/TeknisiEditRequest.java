@@ -4,7 +4,7 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
-public class TeknisiRequest {
+public class TeknisiEditRequest {
 
     @NotNull(message = "NIP tidak boleh kosong")
     private Integer nip;
@@ -22,9 +22,8 @@ public class TeknisiRequest {
     )
     private String noHp;
 
-    @NotBlank(message = "Password tidak boleh kosong")
     @Size(min = 8, message = "Password minimal 8 karakter")
-    private String password;
+    private String password; // tidak @NotBlank
 
     private String spesialisasi;
 }

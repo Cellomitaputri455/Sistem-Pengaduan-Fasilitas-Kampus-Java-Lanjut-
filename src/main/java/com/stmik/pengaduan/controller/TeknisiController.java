@@ -1,6 +1,7 @@
 package com.stmik.pengaduan.controller;
 
 import com.stmik.pengaduan.dto.request.TeknisiRequest;
+import com.stmik.pengaduan.dto.request.TeknisiEditRequest;
 import com.stmik.pengaduan.dto.response.ApiResponse;
 import com.stmik.pengaduan.entity.Teknisi;
 import com.stmik.pengaduan.service.TeknisiService;
@@ -51,7 +52,7 @@ public class TeknisiController {
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SUPER_ADMIN')")
     public ResponseEntity<ApiResponse<Teknisi>> edit(
             @PathVariable Integer id,
-            @Valid @RequestBody TeknisiRequest req) {
+            @Valid @RequestBody TeknisiEditRequest req) {
         return ResponseEntity.ok(ApiResponse.success("Teknisi berhasil diperbarui",
             teknisiService.edit(id, req)));
     }
