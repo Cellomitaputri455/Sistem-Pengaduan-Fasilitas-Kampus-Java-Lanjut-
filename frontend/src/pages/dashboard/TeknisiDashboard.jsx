@@ -289,8 +289,7 @@ export default function TeknisiDashboard() {
                 <div className="flex gap-3 pt-2">
                   <button
                     onClick={() => setSelected(null)}
-                    className="flex-1 border border-gray-300 text-gray-700 text-sm font-medium py-2.5 rounded-lg hover:bg-gray-50 transition"
-                  >
+                    className="flex-1 border border-gray-300 text-gray-700 text-sm font-medium py-2.5 rounded-lg hover:bg-gray-50 transition">
                     Batal
                   </button>
                   <button

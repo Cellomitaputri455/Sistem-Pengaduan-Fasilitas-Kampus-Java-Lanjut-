@@ -2,6 +2,7 @@ package com.stmik.pengaduan.service;
 
 import com.stmik.pengaduan.dto.request.LoginRequest;
 import com.stmik.pengaduan.dto.request.RegisterRequest;
+import com.stmik.pengaduan.dto.request.UpdateProfilRequest;
 import com.stmik.pengaduan.dto.response.JwtResponse;
 import com.stmik.pengaduan.entity.Mahasiswa;
 import com.stmik.pengaduan.entity.User;
@@ -66,6 +67,27 @@ public class AuthService {
         mahasiswa.setIsActive(true);
 
         mahasiswaRepository.save(mahasiswa);
+    }
+
+    @Transactional
+    public User updateProfil(UpdateProfilRequest req) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = userRepository.findByUsername(auth.getName())
+            .orElseThrow(() -> new BadRequestException("User tidak ditemukan"));
+
+        if (!user.getEmail().equals(req.getEmail()) && userRepository.existsByEmail(req.getEmail())) {
+            throw new BadRequestException("Email sudah digunakan");
+        }
+
+        user.setNamaLengkap(req.getNamaLengkap());
+        user.setEmail(req.getEmail());
+        user.setNoHp(req.getNoHp());
+
+        if (req.getPassword() != null && !req.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(req.getPassword()));
+        }
+
+        return userRepository.save(user);
     }
 
     public JwtResponse login(LoginRequest req) {

@@ -38,7 +38,7 @@ export default function Login() {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-800">Sistem Pengaduan</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Sistem Pengaduan Fasilitas</h1>
           <p className="text-gray-500 text-sm mt-1">STMIK Mardira Indonesia</p>
         </div>
 

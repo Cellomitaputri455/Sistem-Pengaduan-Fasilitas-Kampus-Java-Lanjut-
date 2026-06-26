@@ -37,6 +37,17 @@ public class AdminController {
         @NotBlank @Size(min = 8) private String password;
     }
 
+    @Data
+    static class AdminEditRequest {
+        @NotNull private Integer nip;
+        @NotBlank private String namaLengkap;
+        @NotBlank @Email private String email;
+        @Pattern(regexp = "^[1-9][0-9]{8,12}$",
+                message = "Format No Telepon tidak valid")
+        private String noHp;
+        @Size(min = 8) private String password; // tidak @NotBlank
+    }
+
     // GET semua admin - hanya SuperAdmin
     @GetMapping
     @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN')")
@@ -90,5 +101,22 @@ public class AdminController {
         a.setIsActive(true);
         adminRepo.save(a);
         return ResponseEntity.ok(ApiResponse.success("Admin berhasil diaktifkan"));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<Admin>> edit(
+            @PathVariable Integer id,
+            @Valid @RequestBody AdminEditRequest req) {
+        Admin a = adminRepo.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Admin tidak ditemukan"));
+        a.setNip(req.getNip());
+        a.setNamaLengkap(req.getNamaLengkap());
+        a.setEmail(req.getEmail());
+        a.setNoHp(req.getNoHp());
+        if (req.getPassword() != null && !req.getPassword().isBlank()) {
+            a.setPassword(passwordEncoder.encode(req.getPassword()));
+        }
+        return ResponseEntity.ok(ApiResponse.success("Admin berhasil diperbarui", adminRepo.save(a)));
     }
 }
