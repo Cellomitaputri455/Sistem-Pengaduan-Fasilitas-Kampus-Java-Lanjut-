@@ -79,6 +79,16 @@ export default function AdminTeknisi() {
     }
   }
 
+  const handleAktifkan = async (id) => {
+    if (!confirm('Aktifkan kembali teknisi ini?')) return
+    try {
+      await api.patch(`/api/teknisi/${id}/aktifkan`)
+      fetchTeknisi()
+    } catch (err) {
+      alert(err.response?.data?.message || 'Gagal mengaktifkan teknisi')
+    }
+  }
+
   const fields = [
     { label: 'NIP', key: 'nip', type: 'number', placeholder: '12345' },
     { label: 'Nama Lengkap', key: 'namaLengkap', type: 'text', placeholder: 'Nama teknisi' },
@@ -144,12 +154,19 @@ export default function AdminTeknisi() {
                         >
                           Edit
                         </button>
-                        {t.isActive && (
+                        {t.isActive ? (
                           <button
                             onClick={() => handleNonaktifkan(t.id)}
                             className="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg transition"
                           >
                             Nonaktifkan
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleAktifkan(t.id)}
+                            className="text-xs bg-green-50 hover:bg-green-100 text-green-600 px-3 py-1.5 rounded-lg transition"
+                          >
+                            Aktifkan
                           </button>
                         )}
                       </div>

@@ -4,10 +4,9 @@ import api from '../../api/axios'
 
 const statusColor = {
   PENDING: 'bg-yellow-100 text-yellow-700',
-  ASSIGNED: 'bg-blue-100 text-blue-700',
   IN_PROGRESS: 'bg-purple-100 text-purple-700',
   RESOLVED: 'bg-green-100 text-green-700',
-  REJECTED: 'bg-red-100 text-red-700',
+  CLOSED: 'bg-gray-100 text-gray-600',
 }
 
 const prioritasColor = {
@@ -48,7 +47,7 @@ export default function RiwayatPengaduan() {
       <div className="max-w-3xl mx-auto px-6 py-8">
         {/* Filter */}
         <div className="flex gap-2 mb-6 flex-wrap">
-          {['', 'PENDING', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'REJECTED'].map(s => (
+          {['', 'PENDING', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'].map(s => (
             <button
               key={s}
               onClick={() => setFilter(s)}

@@ -5,7 +5,7 @@ import api from '../../api/axios'
 export default function AdminFasilitas() {
   const [fasilitas, setFasilitas] = useState([])
   const [loading, setLoading] = useState(true)
-  const [modal, setModal] = useState(null) // null | 'tambah' | 'edit'
+  const [modal, setModal] = useState(null)
   const [selected, setSelected] = useState(null)
   const [form, setForm] = useState({ nama: '', kategori: '', lokasi: '', deskripsi: '' })
   const [formLoading, setFormLoading] = useState(false)
@@ -21,9 +21,7 @@ export default function AdminFasilitas() {
       .finally(() => setLoading(false))
   }
 
-  useEffect(() => {
-    fetchFasilitas()
-  }, [search])
+  useEffect(() => { fetchFasilitas() }, [search])
 
   const openTambah = () => {
     setForm({ nama: '', kategori: '', lokasi: '', deskripsi: '' })
@@ -33,7 +31,7 @@ export default function AdminFasilitas() {
 
   const openEdit = (f) => {
     setSelected(f)
-    setForm({ nama: f.nama, kategori: f.kategori, lokasi: f.lokasi, deskripsi: f.deskripsi })
+    setForm({ nama: f.nama ?? '', kategori: f.kategori ?? '', lokasi: f.lokasi ?? '', deskripsi: f.deskripsi ?? '' })
     setFormError('')
     setModal('edit')
   }
@@ -66,6 +64,16 @@ export default function AdminFasilitas() {
     }
   }
 
+  const handleAktifkan = async (id) => {
+    if (!confirm('Aktifkan kembali fasilitas ini?')) return
+    try {
+      await api.patch(`/api/fasilitas/${id}/aktifkan`)
+      fetchFasilitas()
+    } catch (err) {
+      alert(err.response?.data?.message || 'Gagal mengaktifkan fasilitas')
+    }
+  }
+
   return (
     <AdminLayout>
       <div className="px-8 py-8">
@@ -82,7 +90,6 @@ export default function AdminFasilitas() {
           </button>
         </div>
 
-        {/* Search */}
         <div className="mb-5">
           <input
             type="text"
@@ -93,7 +100,6 @@ export default function AdminFasilitas() {
           />
         </div>
 
-        {/* Table */}
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
           {loading ? (
             <div className="px-5 py-10 text-center text-sm text-gray-400">Memuat...</div>
@@ -132,12 +138,19 @@ export default function AdminFasilitas() {
                         >
                           Edit
                         </button>
-                        {f.isActive && (
+                        {f.isActive ? (
                           <button
                             onClick={() => handleNonaktifkan(f.id)}
                             className="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg transition"
                           >
                             Nonaktifkan
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleAktifkan(f.id)}
+                            className="text-xs bg-green-50 hover:bg-green-100 text-green-600 px-3 py-1.5 rounded-lg transition"
+                          >
+                            Aktifkan
                           </button>
                         )}
                       </div>
@@ -150,7 +163,7 @@ export default function AdminFasilitas() {
         </div>
       </div>
 
-      {/* Modal Tambah/Edit */}
+      {/* Modal */}
       {modal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
@@ -174,7 +187,7 @@ export default function AdminFasilitas() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">{f.label}</label>
                   <input
                     type="text"
-                    value={form[f.key]}
+                    value={form[f.key] ?? ''}
                     onChange={e => setForm({ ...form, [f.key]: e.target.value })}
                     className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder={f.placeholder}
@@ -184,7 +197,7 @@ export default function AdminFasilitas() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
                 <textarea
-                  value={form.deskripsi}
+                  value={form.deskripsi ?? ''}
                   onChange={e => setForm({ ...form, deskripsi: e.target.value })}
                   className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Deskripsi fasilitas..."

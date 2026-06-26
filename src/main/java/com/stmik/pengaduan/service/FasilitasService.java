@@ -16,7 +16,7 @@ public class FasilitasService {
     private FasilitasRepository fasilitasRepo;
 
     public List<Fasilitas> getAll() {
-        return fasilitasRepo.findByIsActiveTrueOrderByNamaAsc();
+        return fasilitasRepo.findAllByOrderByNamaAsc();
     }
 
     public Fasilitas getById(Integer id) {
@@ -25,7 +25,7 @@ public class FasilitasService {
     }
 
     public List<Fasilitas> search(String keyword) {
-        return fasilitasRepo.findByNamaContainingIgnoreCaseAndIsActiveTrue(keyword);
+        return fasilitasRepo.findByNamaContainingIgnoreCase(keyword);
     }
 
     @Transactional
@@ -53,6 +53,13 @@ public class FasilitasService {
     public void nonaktifkan(Integer id) {
         Fasilitas f = getById(id);
         f.setIsActive(false);
+        fasilitasRepo.save(f);
+    }
+
+    @Transactional
+    public void aktifkan(Integer id) {
+        Fasilitas f = getById(id);
+        f.setIsActive(true);
         fasilitasRepo.save(f);
     }
 }

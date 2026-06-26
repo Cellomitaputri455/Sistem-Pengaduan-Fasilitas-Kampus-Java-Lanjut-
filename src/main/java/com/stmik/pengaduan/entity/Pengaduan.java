@@ -78,7 +78,7 @@ public class Pengaduan {
     @OneToMany(mappedBy = "pengaduan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<RiwayatStatus> riwayatStatuses;
 
-    @JsonIgnore
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "pengaduan"})
     @OneToOne(mappedBy = "pengaduan", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Rating rating;
 

@@ -64,6 +64,7 @@ public class TeknisiService {
     @Transactional
     public Teknisi edit(Integer id, TeknisiEditRequest req) {
         Teknisi t = getById(id);
+        t.setNip(req.getNip());
         t.setNamaLengkap(req.getNamaLengkap());
         t.setEmail(req.getEmail());
         t.setNoHp(req.getNoHp());

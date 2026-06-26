@@ -58,4 +58,11 @@ public class FasilitasController {
         fasilitasService.nonaktifkan(id);
         return ResponseEntity.ok(ApiResponse.success("Fasilitas berhasil dinonaktifkan"));
     }
+
+    @PatchMapping("/{id}/aktifkan")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SUPER_ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> aktifkan(@PathVariable Integer id) {
+        fasilitasService.aktifkan(id);
+        return ResponseEntity.ok(ApiResponse.success("Fasilitas berhasil diaktifkan"));
+    }
 }

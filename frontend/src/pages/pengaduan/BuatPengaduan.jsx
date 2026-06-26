@@ -15,6 +15,7 @@ export default function BuatPengaduan() {
     prioritas: '',
     idFasilitas: '',
   })
+  const [foto, setFoto] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -24,15 +25,44 @@ export default function BuatPengaduan() {
       .catch(() => setFasilitas([]))
   }, [])
 
+  const handleFoto = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg']
+    const maxSize = 5 * 1024 * 1024 // 5MB
+    if (!allowedTypes.includes(file.type)) {
+      setError('Format file tidak valid. Gunakan JPG atau PNG.')
+      return
+    }
+    if (file.size > maxSize) {
+      setError('Ukuran file maksimal 5MB.')
+      return
+    }
+    setError('')
+    setFoto(file)
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
     setLoading(true)
     try {
-      await api.post('/api/pengaduan', {
+      // Step 1: Submit pengaduan
+      const res = await api.post('/api/pengaduan', {
         ...form,
         idFasilitas: parseInt(form.idFasilitas),
       })
+      const pengaduanId = res.data.data.id
+
+      // Step 2: Upload foto jika ada
+      if (foto) {
+        const formData = new FormData()
+        formData.append('file', foto)
+        await api.post(`/api/pengaduan/${pengaduanId}/bukti`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        })
+      }
+
       navigate('/mahasiswa')
     } catch (err) {
       setError(err.response?.data?.message || 'Gagal membuat pengaduan')
@@ -131,6 +161,21 @@ export default function BuatPengaduan() {
                 rows={4}
                 required
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Foto Bukti Kerusakan <span className="text-gray-400">(opsional, maks 5MB)</span>
+              </label>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/jpg"
+                onChange={handleFoto}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {foto && (
+                <p className="text-xs text-green-600 mt-1">✓ {foto.name}</p>
+              )}
             </div>
 
             {form.prioritas === 'HIGH' && (

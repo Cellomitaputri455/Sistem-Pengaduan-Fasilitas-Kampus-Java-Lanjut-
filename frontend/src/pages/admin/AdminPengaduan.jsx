@@ -4,10 +4,9 @@ import api from '../../api/axios'
 
 const statusColor = {
   PENDING: 'bg-yellow-100 text-yellow-700',
-  ASSIGNED: 'bg-blue-100 text-blue-700',
   IN_PROGRESS: 'bg-purple-100 text-purple-700',
   RESOLVED: 'bg-green-100 text-green-700',
-  REJECTED: 'bg-red-100 text-red-700',
+  CLOSED: 'bg-gray-100 text-gray-600',
 }
 
 const prioritasColor = {
@@ -85,7 +84,7 @@ export default function AdminPengaduan() {
             className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Semua Status</option>
-            {['PENDING', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'REJECTED'].map(s => (
+            {['PENDING', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'].map(s => (
               <option key={s} value={s}>{s}</option>
             ))}
           </select>
@@ -117,6 +116,7 @@ export default function AdminPengaduan() {
                   <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500">Prioritas</th>
                   <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500">Status</th>
                   <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500">Teknisi</th>
+                  <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500">Rating</th>
                   <th className="px-5 py-3 text-left text-xs font-semibold text-gray-500">Aksi</th>
                 </tr>
               </thead>
@@ -141,6 +141,15 @@ export default function AdminPengaduan() {
                     </td>
                     <td className="px-5 py-3 text-gray-600 text-xs">
                       {p.teknisi?.namaLengkap || '-'}
+                    </td>
+                    <td className="px-5 py-3 text-sm">
+                      {p.rating ? (
+                        <span className="font-medium text-yellow-600">⭐ {p.rating.nilai}/5</span>
+                      ) : p.status === 'RESOLVED' ? (
+                        <span className="text-xs text-gray-400">Belum dirating</span>
+                      ) : (
+                        <span className="text-gray-300">—</span>
+                      )}
                     </td>
                     <td className="px-5 py-3">
                       {p.status === 'PENDING' && (

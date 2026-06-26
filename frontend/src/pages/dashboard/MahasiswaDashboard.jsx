@@ -23,16 +23,15 @@ export default function MahasiswaDashboard() {
 
   const statusColor = {
     PENDING: 'bg-yellow-100 text-yellow-700',
-    ASSIGNED: 'bg-blue-100 text-blue-700',
     IN_PROGRESS: 'bg-purple-100 text-purple-700',
     RESOLVED: 'bg-green-100 text-green-700',
-    REJECTED: 'bg-red-100 text-red-700',
+    CLOSED: 'bg-gray-100 text-gray-600',
   }
 
   const stats = {
     total: pengaduan.length,
     pending: pengaduan.filter(p => p.status === 'PENDING').length,
-    inProgress: pengaduan.filter(p => ['ASSIGNED', 'IN_PROGRESS'].includes(p.status)).length,
+    inProgress: pengaduan.filter(p => p.status === 'IN_PROGRESS').length,
     resolved: pengaduan.filter(p => p.status === 'RESOLVED').length,
   }
 
