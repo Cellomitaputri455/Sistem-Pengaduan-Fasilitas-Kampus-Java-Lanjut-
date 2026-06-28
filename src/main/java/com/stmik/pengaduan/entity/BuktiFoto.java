@@ -31,6 +31,9 @@ public class BuktiFoto {
     @Column(name = "upload_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "uploaded_by", length = 20)
+    private String uploadedBy;
+
     @PrePersist
     @PreUpdate
     protected void onCreate() {

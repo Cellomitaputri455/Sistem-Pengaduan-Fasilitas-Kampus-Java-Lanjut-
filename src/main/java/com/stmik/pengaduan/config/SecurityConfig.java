@@ -75,6 +75,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/error").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/fasilitas/**").permitAll()
+                .requestMatchers("/api/pengaduan/*/bukti/file/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session ->

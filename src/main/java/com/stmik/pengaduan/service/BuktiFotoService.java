@@ -26,7 +26,7 @@ public class BuktiFotoService {
     private String uploadDir;
 
     @Transactional
-    public BuktiFoto upload(Integer pengaduanId, MultipartFile file) throws IOException {
+    public BuktiFoto upload(Integer pengaduanId, MultipartFile file, String uploadedBy) throws IOException {
         Pengaduan pengaduan = pengaduanRepo.findById(pengaduanId)
             .orElseThrow(() -> new ResourceNotFoundException("Pengaduan tidak ditemukan"));
 
@@ -54,6 +54,7 @@ public class BuktiFotoService {
         bukti.setNamaFile(file.getOriginalFilename());
         bukti.setUrlFile(uploadDir + "/" + uniqueFilename);
         bukti.setTipeFile(contentType);
+        bukti.setUploadedBy(uploadedBy);
         return buktiFotoRepo.save(bukti);
     }
 

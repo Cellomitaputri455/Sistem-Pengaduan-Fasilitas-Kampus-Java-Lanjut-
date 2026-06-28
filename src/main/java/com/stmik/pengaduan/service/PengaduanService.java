@@ -109,9 +109,10 @@ public class PengaduanService {
     public Pengaduan assignTeknisi(Integer pengaduanId, AssignRequest req) {
         Pengaduan pengaduan = findById(pengaduanId);
 
-        if (pengaduan.getStatus() != StatusEnum.PENDING) {
+        if (pengaduan.getStatus() != StatusEnum.PENDING && 
+            pengaduan.getStatus() != StatusEnum.IN_PROGRESS) {
             throw new BadRequestException(
-                "Pengaduan hanya bisa di-assign jika status PENDING. Status saat ini: "
+                "Pengaduan hanya bisa di-assign jika status PENDING atau IN_PROGRESS. Status saat ini: "
                 + pengaduan.getStatus()
             );
         }

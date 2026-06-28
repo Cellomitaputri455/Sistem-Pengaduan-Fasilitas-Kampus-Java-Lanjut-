@@ -160,6 +160,14 @@ export default function AdminPengaduan() {
                           Assign
                         </button>
                       )}
+                      {p.status === 'IN_PROGRESS' && (
+                        <button
+                          onClick={() => { setAssignModal(p); setAssignError('') }}
+                          className="text-xs bg-orange-500 hover:bg-orange-600 text-white px-3 py-1.5 rounded-lg transition"
+                        >
+                          Reassign
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}

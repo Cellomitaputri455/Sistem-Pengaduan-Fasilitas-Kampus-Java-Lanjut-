@@ -25,19 +25,31 @@ export default function DetailPengaduan() {
   const [ratingLoading, setRatingLoading] = useState(false)
   const [ratingSuccess, setRatingSuccess] = useState('')
   const [ratingError, setRatingError] = useState('')
+  const [buktiFoto, setBuktiFoto] = useState([])
+  
 
   useEffect(() => {
     Promise.all([
       api.get(`/api/pengaduan/${id}`),
       api.get(`/api/pengaduan/${id}/riwayat-status`),
+      api.get(`/api/pengaduan/${id}/bukti`),
     ])
-      .then(([detailRes, riwayatRes]) => {
+      .then(([detailRes, riwayatRes, buktiRes]) => {
         setPengaduan(detailRes.data.data)
         setRiwayatStatus(riwayatRes.data.data || [])
+        setBuktiFoto(buktiRes.data.data || [])
       })
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [id])
+
+  const getImageUrl = (urlFile) => {
+    const filename = urlFile.split('/').pop()
+    return `http://localhost:8080/api/pengaduan/${id}/bukti/file/${filename}`
+  }
+
+  const fotoMahasiswa = buktiFoto.filter(b => b.uploadedBy === 'MAHASISWA' || b.uploadedBy === null)
+  const fotoTeknisi = buktiFoto.filter(b => b.uploadedBy === 'TEKNISI')
 
   const handleRating = async (e) => {
     e.preventDefault()
@@ -121,6 +133,26 @@ export default function DetailPengaduan() {
           </div>
         </div>
 
+        {/* Foto Bukti Kerusakan dari Mahasiswa */}
+        {fotoMahasiswa.length > 0 && (
+          <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <h3 className="text-sm font-semibold text-gray-700 mb-4">Foto Bukti Kerusakan</h3>
+            <div className="grid grid-cols-2 gap-3">
+              {fotoMahasiswa.map(b => (
+                <div key={b.id} className="rounded-lg overflow-hidden border border-gray-200">
+                  <img
+                    src={getImageUrl(b.urlFile)}
+                    alt={b.namaFile}
+                    className="w-full h-40 object-cover"
+                    onError={e => e.target.style.display = 'none'}
+                  />
+                  <p className="text-xs text-gray-400 px-2 py-1 truncate">{b.namaFile}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Riwayat Status */}
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <h3 className="text-sm font-semibold text-gray-700 mb-4">Riwayat Status</h3>
@@ -151,11 +183,30 @@ export default function DetailPengaduan() {
           )}
         </div>
 
+        {/* Foto Bukti Penyelesaian dari Teknisi */}
+        {fotoTeknisi.length > 0 && (
+          <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <h3 className="text-sm font-semibold text-gray-700 mb-4">Foto Bukti Penyelesaian</h3>
+            <div className="grid grid-cols-2 gap-3">
+              {fotoTeknisi.map(b => (
+                <div key={b.id} className="rounded-lg overflow-hidden border border-gray-200">
+                  <img
+                    src={getImageUrl(b.urlFile)}
+                    alt={b.namaFile}
+                    className="w-full h-40 object-cover"
+                    onError={e => e.target.style.display = 'none'}
+                  />
+                  <p className="text-xs text-gray-400 px-2 py-1 truncate">{b.namaFile}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Rating — hanya jika RESOLVED dan belum ada rating */}
         {pengaduan.status === 'RESOLVED' && !pengaduan.rating && (
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <h3 className="text-sm font-semibold text-gray-700 mb-4">Beri Rating</h3>
-
             {ratingSuccess ? (
               <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
                 {ratingSuccess}

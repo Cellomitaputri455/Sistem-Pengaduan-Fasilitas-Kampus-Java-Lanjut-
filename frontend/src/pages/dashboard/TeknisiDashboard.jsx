@@ -27,6 +27,7 @@ export default function TeknisiDashboard() {
   const [updateLoading, setUpdateLoading] = useState(false)
   const [updateError, setUpdateError] = useState('')
   const [updateSuccess, setUpdateSuccess] = useState('')
+  const [buktiFoto, setBuktiFoto] = useState([])
 
   const fetchTugas = () => {
     setLoading(true)
@@ -49,6 +50,10 @@ export default function TeknisiDashboard() {
     setFoto(null)
     setUpdateError('')
     setUpdateSuccess('')
+    setBuktiFoto([])
+    api.get(`/api/pengaduan/${t.id}/bukti`)
+      .then(res => setBuktiFoto(res.data.data || []))
+      .catch(() => setBuktiFoto([]))
   }
 
   const handleFoto = (e) => {
@@ -66,6 +71,11 @@ export default function TeknisiDashboard() {
     }
     setUpdateError('')
     setFoto(file)
+  }
+
+  const getImageUrl = (pengaduanId, urlFile) => {
+    const filename = urlFile.split('/').pop()
+    return `http://localhost:8080/api/pengaduan/${pengaduanId}/bukti/file/${filename}`
   }
 
   const handleUpdate = async () => {
@@ -227,6 +237,24 @@ export default function TeknisiDashboard() {
                   <span className="text-sm text-yellow-500">/ 5</span>
                 </div>
                 <p className="text-sm text-gray-600 mt-1">{selected.rating.feedback}</p>
+                {buktiFoto.length > 0 && (
+                  <div className="mb-5">
+                    <p className="text-xs font-semibold text-gray-700 mb-2">Bukti Foto</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {buktiFoto.map(b => (
+                        <div key={b.id} className="rounded-lg overflow-hidden border border-gray-200">
+                          <img
+                            src={getImageUrl(selected.id, b.urlFile)}
+                            alt={b.namaFile}
+                            className="w-full h-32 object-cover"
+                            onError={e => e.target.style.display = 'none'}
+                          />
+                          <p className="text-xs text-gray-400 px-2 py-1 truncate">{b.namaFile}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

@@ -22,12 +22,16 @@ export default function AdminLaporan() {
   const [loading, setLoading] = useState(true)
   const [filterStatus, setFilterStatus] = useState('')
   const [filterPrioritas, setFilterPrioritas] = useState('')
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
 
   const fetchLaporan = () => {
     setLoading(true)
     const params = []
     if (filterStatus) params.push(`status=${filterStatus}`)
     if (filterPrioritas) params.push(`prioritas=${filterPrioritas}`)
+    if (startDate) params.push(`startDate=${startDate}T00:00:00`)
+    if (endDate) params.push(`endDate=${endDate}T23:59:59`)
     const url = '/api/laporan' + (params.length ? '?' + params.join('&') : '')
 
     api.get(url)
@@ -36,36 +40,53 @@ export default function AdminLaporan() {
       .finally(() => setLoading(false))
   }
 
-  useEffect(() => { fetchLaporan() }, [filterStatus, filterPrioritas])
+  useEffect(() => { fetchLaporan() }, [filterStatus, filterPrioritas, startDate, endDate])
 
   const exportPDF = () => {
-  const doc = new jsPDF()
+    const doc = new jsPDF()
 
-  doc.setFontSize(14)
-  doc.text('Laporan Pengaduan Fasilitas Kampus', 14, 15)
-  doc.setFontSize(10)
-  doc.text(`STMIK Mardira Indonesia`, 14, 22)
-  doc.text(`Dicetak: ${new Date().toLocaleDateString('id-ID')}`, 14, 28)
+    doc.setFontSize(14)
+    doc.text('Laporan Pengaduan Fasilitas Kampus', 14, 15)
+    doc.setFontSize(10)
+    doc.text('STMIK Mardira Indonesia', 14, 22)
+    doc.text(`Dicetak: ${new Date().toLocaleDateString('id-ID')}`, 14, 28)
 
-  autoTable(doc, {
-    startY: 35,
-    head: [['No', 'Nomor', 'Judul', 'Mahasiswa', 'Prioritas', 'Status', 'Teknisi', 'Tanggal']],
-    body: laporan.map((p, i) => [
-      i + 1,
-      p.nomorPengaduan,
-      p.judul,
-      p.mahasiswa?.namaLengkap || '-',
-      p.prioritas,
-      p.status,
-      p.teknisi?.namaLengkap || '-',
-      new Date(p.createdAt).toLocaleDateString('id-ID'),
-    ]),
-    styles: { fontSize: 8 },
-    headStyles: { fillColor: [37, 99, 235] },
-  })
+    const filterInfo = []
+    if (filterStatus) filterInfo.push(`Status: ${filterStatus}`)
+    if (filterPrioritas) filterInfo.push(`Prioritas: ${filterPrioritas}`)
+    if (startDate) filterInfo.push(`Dari: ${new Date(startDate).toLocaleDateString('id-ID')}`)
+    if (endDate) filterInfo.push(`Sampai: ${new Date(endDate).toLocaleDateString('id-ID')}`)
+    if (filterInfo.length > 0) {
+      doc.text(`Filter: ${filterInfo.join(' | ')}`, 14, 34)
+    }
 
-  doc.save(`laporan-pengaduan-${new Date().toISOString().slice(0, 10)}.pdf`)
-}
+    autoTable(doc, {
+      startY: filterInfo.length > 0 ? 40 : 35,
+      head: [['No', 'Nomor', 'Judul', 'Mahasiswa', 'Prioritas', 'Status', 'Teknisi', 'Tanggal']],
+      body: laporan.map((p, i) => [
+        i + 1,
+        p.nomorPengaduan,
+        p.judul,
+        p.mahasiswa?.namaLengkap || '-',
+        p.prioritas,
+        p.status,
+        p.teknisi?.namaLengkap || '-',
+        new Date(p.createdAt).toLocaleDateString('id-ID'),
+      ]),
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [37, 99, 235] },
+    })
+
+    const filename = `laporan-pengaduan${startDate ? `-${startDate}` : ''}${endDate ? `-sd-${endDate}` : ''}-${new Date().toISOString().slice(0, 10)}.pdf`
+    doc.save(filename)
+  }
+
+  const handleReset = () => {
+    setFilterStatus('')
+    setFilterPrioritas('')
+    setStartDate('')
+    setEndDate('')
+  }
 
   return (
     <AdminLayout>
@@ -85,7 +106,7 @@ export default function AdminLaporan() {
         </div>
 
         {/* Filter */}
-        <div className="flex gap-3 mb-6">
+        <div className="flex gap-3 mb-6 flex-wrap items-end">
           <select
             value={filterStatus}
             onChange={e => setFilterStatus(e.target.value)}
@@ -106,6 +127,34 @@ export default function AdminLaporan() {
               <option key={p} value={p}>{p}</option>
             ))}
           </select>
+          <div className="flex items-center gap-2">
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Dari Tanggal</label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={e => setStartDate(e.target.value)}
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Sampai Tanggal</label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={e => setEndDate(e.target.value)}
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+          {(filterStatus || filterPrioritas || startDate || endDate) && (
+            <button
+              onClick={handleReset}
+              className="border border-gray-300 text-gray-600 text-sm px-3 py-2 rounded-lg hover:bg-gray-50 transition"
+            >
+              Reset Filter
+            </button>
+          )}
         </div>
 
         {/* Summary */}
@@ -113,7 +162,7 @@ export default function AdminLaporan() {
           {[
             { label: 'Total', value: laporan.length, color: 'text-gray-700' },
             { label: 'Pending', value: laporan.filter(p => p.status === 'PENDING').length, color: 'text-yellow-600' },
-            { label: 'Diproses', value: laporan.filter(p => ['ASSIGNED', 'IN_PROGRESS'].includes(p.status)).length, color: 'text-blue-600' },
+            { label: 'Diproses', value: laporan.filter(p => p.status === 'IN_PROGRESS').length, color: 'text-blue-600' },
             { label: 'Selesai', value: laporan.filter(p => p.status === 'RESOLVED').length, color: 'text-green-600' },
           ].map(s => (
             <div key={s.label} className="bg-white rounded-xl border border-gray-200 p-4 text-center">
